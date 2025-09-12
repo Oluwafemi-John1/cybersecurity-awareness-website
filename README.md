@@ -10,7 +10,7 @@ A comprehensive cybersecurity education platform built with Next.js, Supabase, a
 - **Quiz System**: Timed quizzes with instant feedback and scoring
 - **Simulations**: Hands-on cybersecurity scenarios and incident response training
 - **Progress Dashboard**: Personal learning analytics and achievement tracking
-- **Admin Panel**: Content management and user administration
+- **Admin Panel**: Comprehensive content management and user administration
 
 ### Technical Features
 - **Modern UI/UX**: Clean, responsive design with dark mode support
@@ -18,6 +18,7 @@ A comprehensive cybersecurity education platform built with Next.js, Supabase, a
 - **Secure Authentication**: Supabase Auth with email confirmation
 - **Database Integration**: PostgreSQL with Row Level Security (RLS)
 - **Performance Optimized**: Server-side rendering and optimized loading
+- **Responsive Design**: Mobile-first approach with proper padding and spacing
 
 ## 🛠 Tech Stack
 
@@ -61,6 +62,8 @@ Run the SQL scripts in order to set up your database:
 5. `scripts/005_create_user_progress.sql` - Progress tracking tables
 6. `scripts/006_create_profile_trigger.sql` - Auto-profile creation
 7. `scripts/007_seed_sample_data.sql` - Sample content
+8. `scripts/008_create_admin_schema.sql` - Admin-specific tables
+9. `scripts/009_create_user_schema.sql` - User-specific tables
 
 ### 4. Run Development Server
 \`\`\`bash
@@ -84,6 +87,11 @@ cyberaware-platform/
 │   ├── quizzes/                 # Quiz system
 │   ├── simulations/             # Simulation system
 │   ├── admin/                   # Admin panel
+│   │   ├── users/              # User management
+│   │   ├── modules/            # Module management
+│   │   ├── quizzes/            # Quiz management
+│   │   ├── simulations/        # Simulation management
+│   │   └── analytics/          # Analytics dashboard
 │   └── layout.tsx               # Root layout
 ├── components/                   # Reusable components
 │   ├── ui/                      # shadcn/ui components
@@ -99,78 +107,142 @@ cyberaware-platform/
 └── middleware.ts               # Auth middleware
 \`\`\`
 
-## 🗄 Database Schema
+## 🗄 Database Architecture
+
+### Separate Schema Design
+The platform uses separate database schemas for admin and user functionality to ensure data isolation and security:
+
+#### Admin Schema (`admin`)
+- **admin_settings**: Platform configuration and settings
+- **admin_logs**: Administrative action logs
+- **content_management**: Content creation and editing workflows
+- **user_management**: User administration and role management
+- **analytics_data**: Aggregated analytics and reporting data
+
+#### User Schema (`public`)
+- **profiles**: User profile information
+- **modules**: Learning content and materials
+- **quizzes**: Quiz definitions and questions
+- **simulations**: Interactive scenarios
+- **user_progress**: Learning progress tracking
 
 ### Core Tables
 
-#### `profiles`
+#### `profiles` (User Schema)
 User profile information linked to Supabase Auth users.
 - `id` (UUID, Primary Key)
+- `email` (Text, Not Null)
 - `full_name` (Text)
 - `role` (Text: 'user' | 'admin')
+- `avatar_url` (Text)
 - `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-#### `modules`
+#### `modules` (User Schema)
 Learning modules and course content.
 - `id` (UUID, Primary Key)
-- `title` (Text)
+- `title` (Text, Not Null)
 - `description` (Text)
 - `content` (JSONB)
 - `difficulty_level` (Text)
 - `estimated_duration` (Integer, minutes)
 - `is_published` (Boolean)
+- `created_by` (UUID, Foreign Key to profiles)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-#### `quizzes`
+#### `quizzes` (User Schema)
 Quiz definitions and questions.
 - `id` (UUID, Primary Key)
-- `title` (Text)
+- `title` (Text, Not Null)
 - `description` (Text)
 - `questions` (JSONB)
 - `time_limit` (Integer, minutes)
 - `passing_score` (Integer, percentage)
 - `difficulty_level` (Text)
+- `is_published` (Boolean)
+- `created_by` (UUID, Foreign Key to profiles)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-#### `simulations`
+#### `simulations` (User Schema)
 Interactive cybersecurity simulations.
 - `id` (UUID, Primary Key)
-- `title` (Text)
+- `title` (Text, Not Null)
 - `description` (Text)
 - `scenario` (JSONB)
 - `difficulty_level` (Text)
 - `estimated_duration` (Integer, minutes)
+- `is_published` (Boolean)
+- `created_by` (UUID, Foreign Key to profiles)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
 ### Progress Tracking Tables
 
-#### `user_module_progress`
+#### `user_module_progress` (User Schema)
 Tracks user progress through learning modules.
-- `user_id` (UUID, Foreign Key)
-- `module_id` (UUID, Foreign Key)
-- `progress_percentage` (Integer)
+- `id` (UUID, Primary Key)
+- `user_id` (UUID, Foreign Key to profiles)
+- `module_id` (UUID, Foreign Key to modules)
+- `progress_percentage` (Integer, 0-100)
 - `completed` (Boolean)
 - `last_accessed` (Timestamp)
+- `time_spent` (Integer, seconds)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-#### `user_quiz_attempts`
+#### `user_quiz_attempts` (User Schema)
 Records of user quiz attempts and scores.
-- `user_id` (UUID, Foreign Key)
-- `quiz_id` (UUID, Foreign Key)
-- `score` (Integer)
+- `id` (UUID, Primary Key)
+- `user_id` (UUID, Foreign Key to profiles)
+- `quiz_id` (UUID, Foreign Key to quizzes)
+- `score` (Integer, 0-100)
 - `answers` (JSONB)
 - `passed` (Boolean)
+- `time_taken` (Integer, seconds)
 - `completed_at` (Timestamp)
+- `created_at` (Timestamp)
 
-#### `user_simulation_attempts`
+#### `user_simulation_attempts` (User Schema)
 Records of user simulation attempts.
-- `user_id` (UUID, Foreign Key)
-- `simulation_id` (UUID, Foreign Key)
-- `score` (Integer)
+- `id` (UUID, Primary Key)
+- `user_id` (UUID, Foreign Key to profiles)
+- `simulation_id` (UUID, Foreign Key to simulations)
+- `score` (Integer, 0-100)
 - `decisions` (JSONB)
 - `completed` (Boolean)
+- `time_taken` (Integer, seconds)
 - `completed_at` (Timestamp)
+- `created_at` (Timestamp)
+
+### Admin Tables
+
+#### `admin_settings` (Admin Schema)
+Platform configuration and settings.
+- `id` (UUID, Primary Key)
+- `setting_key` (Text, Unique)
+- `setting_value` (JSONB)
+- `description` (Text)
+- `updated_by` (UUID, Foreign Key to profiles)
+- `updated_at` (Timestamp)
+
+#### `admin_logs` (Admin Schema)
+Administrative action logs for audit trail.
+- `id` (UUID, Primary Key)
+- `admin_id` (UUID, Foreign Key to profiles)
+- `action` (Text)
+- `resource_type` (Text)
+- `resource_id` (UUID)
+- `details` (JSONB)
+- `ip_address` (Text)
+- `user_agent` (Text)
+- `created_at` (Timestamp)
 
 ## 🔐 Authentication Flow
 
 ### Sign Up Process
-1. User fills registration form
+1. User fills registration form at `/auth/sign-up`
 2. Supabase sends confirmation email
 3. User clicks email link → `/auth/callback`
 4. Callback exchanges code for session
@@ -178,7 +250,7 @@ Records of user simulation attempts.
 6. Profile automatically created via trigger
 
 ### Sign In Process
-1. User enters credentials
+1. User enters credentials at `/auth/login`
 2. Supabase validates and creates session
 3. Middleware protects routes
 4. User redirected to dashboard
@@ -186,36 +258,56 @@ Records of user simulation attempts.
 ### Route Protection
 - Middleware checks authentication on all routes
 - Unauthenticated users redirected to `/auth/login`
-- Admin routes check user role
+- Admin routes check user role in database
+- Protected routes: `/dashboard/*`, `/admin/*`
 
-## 🎯 Key Features Guide
+## 🎯 Admin Panel Features
 
-### Learning Modules
-- **Structure**: Modules contain sections with rich content
-- **Progress**: Automatic progress tracking as users read
-- **Navigation**: Table of contents with section jumping
-- **Completion**: Modules marked complete when fully read
+### Dashboard Overview (`/admin`)
+- **User Statistics**: Total users, new registrations, active users
+- **Content Statistics**: Published/draft modules, quizzes, simulations
+- **Activity Monitoring**: Recent user activities and system events
+- **Quick Actions**: Fast access to content creation and management
 
-### Quiz System
-- **Timed Quizzes**: Configurable time limits with countdown
-- **Multiple Choice**: Radio button selection interface
-- **Instant Feedback**: Detailed results with correct answers
-- **Retakes**: Users can retake quizzes to improve scores
-- **Progress Tracking**: Best scores and attempt history
+### User Management (`/admin/users`)
+- **User List**: Paginated view of all registered users
+- **User Details**: Individual user profiles and activity history
+- **Role Management**: Assign/revoke admin privileges
+- **Account Actions**: Suspend, activate, or delete user accounts
+- **Bulk Operations**: Mass user management actions
 
-### Simulations
-- **Interactive Scenarios**: Step-by-step decision making
-- **Real-world Context**: Phishing, incident response, etc.
-- **Scoring System**: Points based on correct decisions
-- **Feedback**: Detailed explanations for each choice
+### Content Management
+#### Modules (`/admin/modules`)
+- **Module List**: All learning modules with status indicators
+- **Create/Edit**: Rich content editor for module creation
+- **Publishing**: Draft/publish workflow with version control
+- **Analytics**: Module completion rates and user engagement
 
-### Admin Panel
-- **User Management**: View and manage user accounts
-- **Content Management**: Create and edit modules, quizzes
-- **Analytics**: Platform usage and learning statistics
-- **Role Management**: Assign admin privileges
+#### Quizzes (`/admin/quizzes`)
+- **Quiz Builder**: Interactive quiz creation interface
+- **Question Bank**: Reusable question library
+- **Scoring Configuration**: Custom scoring and passing criteria
+- **Performance Analytics**: Quiz attempt statistics and success rates
 
-## 🎨 Design System
+#### Simulations (`/admin/simulations`)
+- **Scenario Builder**: Interactive simulation creation tools
+- **Decision Trees**: Complex branching scenario logic
+- **Scoring System**: Custom scoring based on user decisions
+- **Usage Analytics**: Simulation completion and performance data
+
+### Analytics Dashboard (`/admin/analytics`)
+- **User Engagement**: Login frequency, session duration, feature usage
+- **Learning Progress**: Module completion rates, quiz performance
+- **Content Performance**: Most popular content, completion rates
+- **System Health**: Performance metrics, error rates, uptime
+
+### System Settings (`/admin/settings`)
+- **Platform Configuration**: Site settings, feature toggles
+- **Email Templates**: Customizable notification templates
+- **Security Settings**: Password policies, session management
+- **Integration Settings**: Third-party service configurations
+
+## 🎨 Design System & Responsive Design
 
 ### Color Palette
 - **Primary**: Blue (#2563eb) - Trust and security
@@ -229,11 +321,69 @@ Records of user simulation attempts.
 - **Body**: GeistSans (Regular, 16px base)
 - **Code**: GeistMono (Monospace for technical content)
 
+### Responsive Breakpoints
+- **Mobile**: 320px - 768px (sm)
+- **Tablet**: 768px - 1024px (md)
+- **Desktop**: 1024px - 1280px (lg)
+- **Large Desktop**: 1280px+ (xl)
+
+### Spacing System
+- **Container Padding**: 
+  - Mobile: `px-4` (16px)
+  - Tablet: `px-6` (24px)
+  - Desktop: `px-8` (32px)
+- **Section Spacing**: `py-8` to `py-16` based on screen size
+- **Component Spacing**: Consistent `gap-4` to `gap-8` throughout
+
 ### Components
-- **Cards**: Elevated surfaces for content grouping
-- **Buttons**: Primary, secondary, and outline variants
-- **Forms**: Consistent input styling with validation
-- **Navigation**: Clean, accessible menu systems
+- **Cards**: Elevated surfaces with proper padding and responsive layouts
+- **Buttons**: Primary, secondary, and outline variants with touch-friendly sizing
+- **Forms**: Consistent input styling with validation and mobile optimization
+- **Navigation**: Responsive menu systems with mobile hamburger menu
+- **Tables**: Responsive tables with horizontal scroll on mobile
+
+## 📱 Route Documentation
+
+### Public Routes
+- `/` - Landing page with platform overview
+- `/auth/login` - User login page
+- `/auth/sign-up` - User registration page
+- `/auth/callback` - Email confirmation callback
+- `/auth/error` - Authentication error handling
+
+### Protected User Routes
+- `/dashboard` - User dashboard with progress overview
+- `/modules` - Learning modules listing
+- `/modules/[id]` - Individual module viewer
+- `/quizzes` - Available quizzes listing
+- `/quizzes/[id]` - Quiz taking interface
+- `/simulations` - Simulation scenarios listing
+- `/simulations/[id]` - Interactive simulation interface
+
+### Admin Routes (Role-Protected)
+- `/admin` - Admin dashboard overview
+- `/admin/users` - User management interface
+- `/admin/users/[id]` - Individual user management
+- `/admin/modules` - Module content management
+- `/admin/modules/create` - Create new module
+- `/admin/modules/[id]/edit` - Edit existing module
+- `/admin/quizzes` - Quiz management interface
+- `/admin/quizzes/create` - Create new quiz
+- `/admin/quizzes/[id]/edit` - Edit existing quiz
+- `/admin/simulations` - Simulation management
+- `/admin/simulations/create` - Create new simulation
+- `/admin/simulations/[id]/edit` - Edit existing simulation
+- `/admin/analytics` - Platform analytics dashboard
+- `/admin/settings` - System configuration
+
+### API Routes
+- `/api/auth/callback` - Supabase auth callback handler
+- `/api/modules/[id]/progress` - Update module progress
+- `/api/quizzes/[id]/submit` - Submit quiz answers
+- `/api/simulations/[id]/submit` - Submit simulation results
+- `/api/admin/users` - User management API
+- `/api/admin/content` - Content management API
+- `/api/admin/analytics` - Analytics data API
 
 ## 🚀 Deployment
 
@@ -267,38 +417,50 @@ npm run lint         # Run ESLint
 - Use Supabase dashboard for schema changes
 - Run migration scripts in order
 - Test with sample data before production
+- Maintain separate admin and user schemas
 
 ### Adding New Features
 1. Create database tables if needed
 2. Add TypeScript interfaces
-3. Build UI components
+3. Build UI components with responsive design
 4. Implement server actions
 5. Add proper error handling
 6. Update documentation
+7. Test on multiple screen sizes
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
 #### Email Confirmation Not Working
-- Check callback route is properly configured
-- Verify environment variables are set
+- Check callback route is properly configured at `/auth/callback`
+- Verify environment variables are set correctly
 - Ensure Supabase email settings are configured
+- Check redirect URL matches your domain
 
 #### Database Connection Issues
-- Verify Supabase credentials
-- Check RLS policies are properly set
-- Ensure user has proper permissions
+- Verify Supabase credentials in environment variables
+- Check RLS policies are properly set for both schemas
+- Ensure user has proper permissions for admin functions
+- Verify schema separation is working correctly
 
 #### Authentication Errors
 - Clear browser cookies and localStorage
-- Check middleware configuration
+- Check middleware configuration in `middleware.ts`
 - Verify Supabase project settings
+- Ensure admin role is properly assigned in database
 
 #### Performance Issues
 - Enable database indexing for large tables
 - Optimize queries with proper joins
 - Use React.memo for expensive components
+- Implement proper loading states
+
+#### Responsive Design Issues
+- Test on multiple device sizes
+- Check Tailwind breakpoints are properly applied
+- Ensure proper padding and spacing on mobile
+- Verify touch targets are appropriately sized
 
 ## 📚 Learning Resources
 
@@ -320,9 +482,10 @@ npm run lint         # Run ESLint
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
+3. Make your changes with proper responsive design
 4. Add tests if applicable
-5. Submit a pull request
+5. Update documentation
+6. Submit a pull request
 
 ## 📄 License
 
@@ -332,7 +495,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions:
 - Check the troubleshooting section
-- Review the documentation
+- Review the route documentation
+- Test admin functionality with proper role assignment
 - Open an issue on GitHub
 - Contact the development team
 

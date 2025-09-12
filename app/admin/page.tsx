@@ -133,34 +133,36 @@ export default async function AdminPage() {
     <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950/50">
       <DashboardNav user={data.user} />
 
-      <main className="container py-8">
-        <div className="space-y-8">
+      <main className="container px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        <div className="space-y-6 sm:space-y-8 lg:space-y-10">
           {/* Header */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                <p className="text-muted-foreground">Manage your Cyberaware platform content and users</p>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Admin Dashboard</h1>
+                <p className="text-sm sm:text-base text-muted-foreground text-pretty">
+                  Manage your Cyberaware platform content and users
+                </p>
               </div>
-              <Badge variant="default" className="bg-blue-600">
+              <Badge variant="default" className="bg-blue-600 w-fit">
                 Administrator
               </Badge>
             </div>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {stats.map((stat, index) => (
-              <Card key={index}>
-                <CardContent className="p-6">
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
+                    <div className="space-y-1 sm:space-y-2 min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{stat.title}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
                       <p className="text-xs text-muted-foreground">{stat.change}</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    <div className={`p-2 sm:p-3 rounded-lg ${stat.bgColor} flex-shrink-0 ml-3`}>
+                      <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
                     </div>
                   </div>
                 </CardContent>
@@ -168,28 +170,35 @@ export default async function AdminPage() {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Quick Actions */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Plus className="h-5 w-5" />
+                <CardHeader className="pb-4 sm:pb-6">
+                  <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                    <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Quick Actions</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                     {quickActions.map((action, index) => (
-                      <Button key={index} variant="outline" className="h-auto p-4 justify-start bg-transparent" asChild>
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="h-auto p-4 justify-start bg-transparent hover:bg-muted/50"
+                        asChild
+                      >
                         <Link href={action.href}>
-                          <div className="flex items-center space-x-3">
-                            <div className={`p-2 rounded ${action.color} text-white`}>
+                          <div className="flex items-center space-x-3 w-full">
+                            <div className={`p-2 rounded ${action.color} text-white flex-shrink-0`}>
                               <action.icon className="h-4 w-4" />
                             </div>
-                            <div className="text-left">
-                              <div className="font-medium">{action.title}</div>
-                              <div className="text-sm text-muted-foreground">{action.description}</div>
+                            <div className="text-left min-w-0 flex-1">
+                              <div className="font-medium text-sm sm:text-base truncate">{action.title}</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground text-pretty">
+                                {action.description}
+                              </div>
                             </div>
                           </div>
                         </Link>
@@ -201,50 +210,52 @@ export default async function AdminPage() {
 
               {/* Recent Activity */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5" />
+                <CardHeader className="pb-4 sm:pb-6">
+                  <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Recent Activity</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded">
-                            <BookOpen className="h-4 w-4 text-emerald-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">Module Completions</p>
-                            <p className="text-xs text-muted-foreground">
-                              {completedModules} modules completed by users
-                            </p>
-                          </div>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-muted rounded-lg">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded flex-shrink-0">
+                          <BookOpen className="h-4 w-4 text-emerald-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm sm:text-base">Module Completions</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {completedModules} modules completed by users
+                          </p>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded">
-                            <Target className="h-4 w-4 text-purple-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">Quiz Attempts</p>
-                            <p className="text-xs text-muted-foreground">{totalQuizAttempts} recent quiz attempts</p>
-                          </div>
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-muted rounded-lg">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded flex-shrink-0">
+                          <Target className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm sm:text-base">Quiz Attempts</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {totalQuizAttempts} recent quiz attempts
+                          </p>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded">
-                            <Users className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">New Users</p>
-                            <p className="text-xs text-muted-foreground">{newUsersThisWeek} new users this week</p>
-                          </div>
+                    <div className="flex items-center justify-between p-3 sm:p-4 bg-muted rounded-lg">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded flex-shrink-0">
+                          <Users className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm sm:text-base">New Users</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {newUsersThisWeek} new users this week
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -254,54 +265,54 @@ export default async function AdminPage() {
             </div>
 
             {/* Management Links */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Content Management</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg sm:text-xl">Content Management</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                <CardContent className="space-y-2 sm:space-y-3">
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/modules">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      Manage Modules
+                      <BookOpen className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Manage Modules</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/quizzes">
-                      <Target className="mr-2 h-4 w-4" />
-                      Manage Quizzes
+                      <Target className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Manage Quizzes</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/simulations">
-                      <Brain className="mr-2 h-4 w-4" />
-                      Manage Simulations
+                      <Brain className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Manage Simulations</span>
                     </Link>
                   </Button>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>System Management</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg sm:text-xl">System Management</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                <CardContent className="space-y-2 sm:space-y-3">
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/users">
-                      <Users className="mr-2 h-4 w-4" />
-                      User Management
+                      <Users className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">User Management</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/analytics">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Analytics
+                      <BarChart3 className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Analytics</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/admin/settings">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                      <Settings className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Settings</span>
                     </Link>
                   </Button>
                 </CardContent>

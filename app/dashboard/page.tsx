@@ -79,30 +79,30 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950/50">
       <DashboardNav user={data.user} />
 
-      <main className="container py-8">
-        <div className="space-y-8">
+      <main className="container px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        <div className="space-y-6 sm:space-y-8 lg:space-y-10">
           {/* Welcome Section */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-balance">
+          <div className="space-y-2 sm:space-y-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance">
               Welcome back, {profile?.full_name || data.user.email?.split("@")[0]}!
             </h1>
-            <p className="text-muted-foreground text-pretty">
+            <p className="text-sm sm:text-base text-muted-foreground text-pretty max-w-2xl">
               Continue your cybersecurity learning journey. You're making great progress!
             </p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {stats.map((stat, index) => (
-              <Card key={index}>
-                <CardContent className="p-6">
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
+                    <div className="space-y-1 sm:space-y-2 min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{stat.title}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    <div className={`p-2 sm:p-3 rounded-lg ${stat.bgColor} flex-shrink-0 ml-3`}>
+                      <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
                     </div>
                   </div>
                 </CardContent>
@@ -110,23 +110,28 @@ export default async function DashboardPage() {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Continue Learning */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5" />
+                <CardHeader className="pb-4 sm:pb-6">
+                  <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>Continue Learning</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4">
                   {recentModules?.map((module) => (
-                    <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="space-y-1">
-                        <h3 className="font-medium text-balance">{module.title}</h3>
-                        <p className="text-sm text-muted-foreground text-pretty">{module.description}</p>
-                        <div className="flex items-center space-x-2">
+                    <div
+                      key={module.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-0 sm:space-x-4"
+                    >
+                      <div className="space-y-1 sm:space-y-2 min-w-0 flex-1">
+                        <h3 className="font-medium text-sm sm:text-base text-balance">{module.title}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground text-pretty line-clamp-2">
+                          {module.description}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="secondary" className="text-xs">
                             {module.difficulty_level}
                           </Badge>
@@ -136,7 +141,7 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                      <Button size="sm" asChild>
+                      <Button size="sm" className="w-full sm:w-auto flex-shrink-0" asChild>
                         <Link href={`/modules/${module.id}`}>
                           <Play className="h-4 w-4 mr-1" />
                           Start
@@ -145,7 +150,7 @@ export default async function DashboardPage() {
                     </div>
                   ))}
 
-                  <div className="pt-4">
+                  <div className="pt-2 sm:pt-4">
                     <Button variant="outline" className="w-full bg-transparent" asChild>
                       <Link href="/modules">
                         View All Modules
@@ -158,28 +163,28 @@ export default async function DashboardPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" asChild>
+                <CardContent className="space-y-2 sm:space-y-3">
+                  <Button className="w-full justify-start h-auto py-3 px-4" asChild>
                     <Link href="/quizzes">
-                      <Target className="mr-2 h-4 w-4" />
-                      Take a Quiz
+                      <Target className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Take a Quiz</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/simulations">
-                      <Brain className="mr-2 h-4 w-4" />
-                      Try Simulation
+                      <Brain className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">Try Simulation</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                  <Button variant="outline" className="w-full justify-start bg-transparent h-auto py-3 px-4" asChild>
                     <Link href="/progress">
-                      <TrendingUp className="mr-2 h-4 w-4" />
-                      View Progress
+                      <TrendingUp className="mr-3 h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">View Progress</span>
                     </Link>
                   </Button>
                 </CardContent>
@@ -187,27 +192,27 @@ export default async function DashboardPage() {
 
               {/* Learning Progress */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Learning Progress</CardTitle>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg sm:text-xl">Learning Progress</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                <CardContent className="space-y-4 sm:space-y-6">
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex justify-between text-sm sm:text-base">
                       <span>Overall Progress</span>
-                      <span>65%</span>
+                      <span className="font-medium">65%</span>
                     </div>
-                    <Progress value={65} className="h-2" />
+                    <Progress value={65} className="h-2 sm:h-3" />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex justify-between text-sm sm:text-base">
                       <span>This Week</span>
-                      <span>3 modules</span>
+                      <span className="font-medium">3 modules</span>
                     </div>
-                    <Progress value={75} className="h-2" />
+                    <Progress value={75} className="h-2 sm:h-3" />
                   </div>
 
-                  <div className="pt-2 text-xs text-muted-foreground">
+                  <div className="pt-2 text-xs sm:text-sm text-muted-foreground text-pretty">
                     Keep up the great work! You're ahead of 78% of learners.
                   </div>
                 </CardContent>
